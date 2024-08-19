@@ -32,14 +32,15 @@ def run(args,mode = 0):
         return sout
 
 def video2image(videopath, imagepath, fps=0, start_time='00:00:00', last_time='00:00:00'):
-    args = ['ffmpeg']
+    args = ['ffmpeg', '-hwaccel', 'cuda']
     if last_time != '00:00:00':
         args += ['-ss', start_time]
         args += ['-t', last_time]
     args += ['-i', '"'+videopath+'"']
     if fps != 0:
         args += ['-r', str(fps)]
-    args += ['-f', 'image2','-q:v','-0',imagepath]
+    args += ['-f', 'image2','-q:v','2',imagepath]
+    print(' '.join(args))
     run(args)
 
 def video2voice(videopath, voicepath, start_time='00:00:00', last_time='00:00:00'):
@@ -51,7 +52,7 @@ def video2voice(videopath, voicepath, start_time='00:00:00', last_time='00:00:00
     run(args)
 
 def image2video(fps,imagepath,voicepath,videopath):
-    os.system('ffmpeg -y -r '+str(fps)+' -i '+imagepath+' -vcodec libx264 '+os.path.split(voicepath)[0]+'/video_tmp.mp4')
+    os.system('ffmpeg -y -r '+str(fps)+' -i '+imagepath+' -c:v hevc_nvenc -pix_fmt p010le -preset slow -rc vbr -cq 20 -b:v 0 '+os.path.split(voicepath)[0]+'/video_tmp.mp4')
     if os.path.exists(voicepath):
         os.system('ffmpeg -i '+os.path.split(voicepath)[0]+'/video_tmp.mp4'+' -i "'+voicepath+'" -vcodec copy -acodec aac '+videopath)
     else:

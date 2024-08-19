@@ -1,6 +1,7 @@
 import argparse
 import os
 import sys
+import hashlib
 
 
 class Options():
@@ -58,7 +59,7 @@ class Options():
         self.opt = self.parser.parse_args()
         
         model_name = os.path.basename(self.opt.model_path)
-        self.opt.temp_dir = os.path.join(self.opt.temp_dir, 'DeepMosaics_temp')
+        self.opt.temp_dir = os.path.join(self.opt.temp_dir, hashlib.md5(self.opt.media_path.encode()).hexdigest())
 
         if self.opt.gpu_id != '-1':
             os.environ["CUDA_VISIBLE_DEVICES"] = str(self.opt.gpu_id)
